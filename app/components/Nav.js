@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const tabs = [
   { label: "Map", href: "/" },
   { label: "Data", href: "/data" },
+  { label: "Congressional Districts", href: "/districts" },
 ];
 
 export default function Nav() {
