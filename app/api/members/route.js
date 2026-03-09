@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 export async function GET() {
   const key = process.env.CONGRESS_API_KEY;
   const base = "https://api.congress.gov/v3/member/congress/119";
