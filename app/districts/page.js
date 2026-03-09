@@ -1,32 +1,173 @@
 import Nav from "../components/Nav";
-import NJDistricts from "../components/NJDistricts";
+import states from "../data/states.json";
 
-const NJ_PATH = "M849.163,245.825L849.739,244.39L850.15,243.655L850.196,242.417L850.745,241.45L851.588,240.378L853.78,239.389L855.099,238.188L854.803,236.864L855.661,236.168L855.942,235.44L857.681,233.597L858.7,233.065L859.201,231.923L859.838,231.94L860.69,230.959L859.539,229.789L858.159,229.275L857.513,228.373L856.018,227.622L855.305,226.412L853.723,226.384L853.29,225.574L853.002,223.724L852.245,223.148L851.248,223.471L850.65,223.323L850.176,221.756L850.466,221.087L849.894,220.772L850.005,218.733L850.683,218.683L851.569,216.208L849.626,214.226L850.193,213.133L851.139,212.337L851.849,211.049L851.507,210.643L852.366,209.744L852.806,208.658L853.098,206.094L854.1,204.476L854.99,204.012L860.958,206.128L869.882,209.004L870.146,209.325L869.804,213.183L869.383,214.595L869.438,215.895L869.18,216.4L868.915,217.149L866.865,218.336L867.002,220L866.535,220.431L866.579,221.431L866.771,222.254L868.033,222.525L868.909,221.957L870.542,222.462L871.42,222.437L871.461,221.539L872.107,223.205L872.41,225.295L872.391,228.977L872.721,233.89L873.197,237.274L871.857,242.457L871.405,243.532L870.899,243.831L871.224,244.402L870.862,245.597L869.927,247.086L869.95,247.464L868.308,248.954L866.835,251.472L866.072,254.028L865.378,257.192L864.416,258.621L863.313,259.152L862.58,259.035L862.566,257.263L863.063,255.194L862.947,253.828L861.506,253.407L860.391,253.577L859.917,253.179L858.832,253.482L858.559,254.269L857.907,253.93L857.584,253.055L856.329,252.588L856.018,252.052L855.46,252.418L854.257,251.314L853.864,251.561L852.522,250.688L851.677,249.746L850.416,249.519L850.192,246.748L849.341,246.35Z";
+import alDistricts from "../data/al-districts.json";
+import akDistricts from "../data/ak-districts.json";
+import azDistricts from "../data/az-districts.json";
+import arDistricts from "../data/ar-districts.json";
+import caDistricts from "../data/ca-districts.json";
+import coDistricts from "../data/co-districts.json";
+import ctDistricts from "../data/ct-districts.json";
+import deDistricts from "../data/de-districts.json";
+import flDistricts from "../data/fl-districts.json";
+import gaDistricts from "../data/ga-districts.json";
+import hiDistricts from "../data/hi-districts.json";
+import idDistricts from "../data/id-districts.json";
+import ilDistricts from "../data/il-districts.json";
+import inDistricts from "../data/in-districts.json";
+import iaDistricts from "../data/ia-districts.json";
+import ksDistricts from "../data/ks-districts.json";
+import kyDistricts from "../data/ky-districts.json";
+import laDistricts from "../data/la-districts.json";
+import meDistricts from "../data/me-districts.json";
+import mdDistricts from "../data/md-districts.json";
+import maDistricts from "../data/ma-districts.json";
+import miDistricts from "../data/mi-districts.json";
+import mnDistricts from "../data/mn-districts.json";
+import msDistricts from "../data/ms-districts.json";
+import moDistricts from "../data/mo-districts.json";
+import mtDistricts from "../data/mt-districts.json";
+import neDistricts from "../data/ne-districts.json";
+import nvDistricts from "../data/nv-districts.json";
+import nhDistricts from "../data/nh-districts.json";
+import njDistricts from "../data/nj-districts.json";
+import nmDistricts from "../data/nm-districts.json";
+import nyDistricts from "../data/ny-districts.json";
+import ncDistricts from "../data/nc-districts.json";
+import ndDistricts from "../data/nd-districts.json";
+import ohDistricts from "../data/oh-districts.json";
+import okDistricts from "../data/ok-districts.json";
+import orDistricts from "../data/or-districts.json";
+import paDistricts from "../data/pa-districts.json";
+import riDistricts from "../data/ri-districts.json";
+import scDistricts from "../data/sc-districts.json";
+import sdDistricts from "../data/sd-districts.json";
+import tnDistricts from "../data/tn-districts.json";
+import txDistricts from "../data/tx-districts.json";
+import utDistricts from "../data/ut-districts.json";
+import vtDistricts from "../data/vt-districts.json";
+import vaDistricts from "../data/va-districts.json";
+import waDistricts from "../data/wa-districts.json";
+import wvDistricts from "../data/wv-districts.json";
+import wiDistricts from "../data/wi-districts.json";
+import wyDistricts from "../data/wy-districts.json";
 
-// NJ bounds from states.json — add 8 units of padding
+const DISTRICT_COLORS = [
+  "#ae5858", "#ae7664", "#ae8a64", "#a19457", "#839757",
+  "#579764", "#57978a", "#578b97", "#576fa4", "#6f57a4",
+  "#8a57a4", "#a4578b", "#a4576f", "#976262", "#628a90",
+  "#7d76a4", "#a18a5c",
+];
+
+function districtColor(cd) {
+  return DISTRICT_COLORS[(parseInt(cd, 10) - 1) % DISTRICT_COLORS.length];
+}
+
 const PAD = 8;
-const X0 = 849.163 - PAD;
-const Y0 = 204.012 - PAD;
-const W  = 873.197 - 849.163 + PAD * 2;
-const H  = 259.152 - 204.012 + PAD * 2;
+
+function getState(id) {
+  const s = states.find(x => x.id === id);
+  return {
+    vb: `${s.bounds.x0 - PAD} ${s.bounds.y0 - PAD} ${s.bounds.x1 - s.bounds.x0 + PAD * 2} ${s.bounds.y1 - s.bounds.y0 + PAD * 2}`,
+    d: s.d,
+  };
+}
+
+function StateRow({ name, fips, districts }) {
+  const { vb, d } = getState(fips);
+  return (
+    <div className="mb-10">
+      <h2 className="text-sm font-semibold mb-3 text-zinc-300">
+        {name} <span className="text-zinc-500 font-normal">· {districts.length} district{districts.length !== 1 ? "s" : ""}</span>
+      </h2>
+      <div className="flex gap-8 items-start">
+        <div style={{ width: 340 }}>
+          <p className="text-xs text-zinc-500 mb-1">Outline</p>
+          <svg viewBox={vb} style={{ width: "100%", height: "auto", display: "block" }}>
+            <path d={d} fill="#1e3a5f" stroke="#ffffff" strokeWidth={0.15} />
+          </svg>
+        </div>
+        <div style={{ width: 340 }}>
+          <p className="text-xs text-zinc-500 mb-1">Congressional districts</p>
+          <svg viewBox={vb} style={{ width: "100%", height: "auto", display: "block" }}>
+            {districts.map(dist => (
+              <path
+                key={dist.cd}
+                d={dist.d}
+                fill={districtColor(dist.cd)}
+                stroke="#ffffff"
+                strokeWidth={0.15}
+              />
+            ))}
+          </svg>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const ALL_STATES = [
+  { name: "Alabama",       fips: "01", districts: alDistricts },
+  { name: "Alaska",        fips: "02", districts: akDistricts },
+  { name: "Arizona",       fips: "04", districts: azDistricts },
+  { name: "Arkansas",      fips: "05", districts: arDistricts },
+  { name: "California",    fips: "06", districts: caDistricts },
+  { name: "Colorado",      fips: "08", districts: coDistricts },
+  { name: "Connecticut",   fips: "09", districts: ctDistricts },
+  { name: "Delaware",      fips: "10", districts: deDistricts },
+  { name: "Florida",       fips: "12", districts: flDistricts },
+  { name: "Georgia",       fips: "13", districts: gaDistricts },
+  { name: "Hawaii",        fips: "15", districts: hiDistricts },
+  { name: "Idaho",         fips: "16", districts: idDistricts },
+  { name: "Illinois",      fips: "17", districts: ilDistricts },
+  { name: "Indiana",       fips: "18", districts: inDistricts },
+  { name: "Iowa",          fips: "19", districts: iaDistricts },
+  { name: "Kansas",        fips: "20", districts: ksDistricts },
+  { name: "Kentucky",      fips: "21", districts: kyDistricts },
+  { name: "Louisiana",     fips: "22", districts: laDistricts },
+  { name: "Maine",         fips: "23", districts: meDistricts },
+  { name: "Maryland",      fips: "24", districts: mdDistricts },
+  { name: "Massachusetts", fips: "25", districts: maDistricts },
+  { name: "Michigan",      fips: "26", districts: miDistricts },
+  { name: "Minnesota",     fips: "27", districts: mnDistricts },
+  { name: "Mississippi",   fips: "28", districts: msDistricts },
+  { name: "Missouri",        fips: "29", districts: moDistricts },
+  { name: "Montana",         fips: "30", districts: mtDistricts },
+  { name: "Nebraska",        fips: "31", districts: neDistricts },
+  { name: "Nevada",          fips: "32", districts: nvDistricts },
+  { name: "New Hampshire",   fips: "33", districts: nhDistricts },
+  { name: "New Jersey",      fips: "34", districts: njDistricts },
+  { name: "New Mexico",      fips: "35", districts: nmDistricts },
+  { name: "New York",        fips: "36", districts: nyDistricts },
+  { name: "North Carolina",  fips: "37", districts: ncDistricts },
+  { name: "North Dakota",    fips: "38", districts: ndDistricts },
+  { name: "Ohio",            fips: "39", districts: ohDistricts },
+  { name: "Oklahoma",        fips: "40", districts: okDistricts },
+  { name: "Oregon",          fips: "41", districts: orDistricts },
+  { name: "Pennsylvania",    fips: "42", districts: paDistricts },
+  { name: "Rhode Island",    fips: "44", districts: riDistricts },
+  { name: "South Carolina",  fips: "45", districts: scDistricts },
+  { name: "South Dakota",    fips: "46", districts: sdDistricts },
+  { name: "Tennessee",       fips: "47", districts: tnDistricts },
+  { name: "Texas",           fips: "48", districts: txDistricts },
+  { name: "Utah",            fips: "49", districts: utDistricts },
+  { name: "Vermont",         fips: "50", districts: vtDistricts },
+  { name: "Virginia",        fips: "51", districts: vaDistricts },
+  { name: "Washington",      fips: "53", districts: waDistricts },
+  { name: "West Virginia",   fips: "54", districts: wvDistricts },
+  { name: "Wisconsin",       fips: "55", districts: wiDistricts },
+  { name: "Wyoming",         fips: "56", districts: wyDistricts },
+];
 
 export default function Districts() {
   return (
     <div className="flex min-h-screen flex-col bg-zinc-950 text-white">
       <Nav />
-      <main className="flex flex-1 p-6">
-        <div className="flex gap-12 items-start">
-          <div style={{ width: 380 }}>
-            <p className="text-xs text-zinc-400 mb-2">State outline</p>
-            <svg viewBox={`${X0} ${Y0} ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}>
-              <path d={NJ_PATH} fill="#1e3a5f" stroke="#ffffff" strokeWidth={0.1} />
-            </svg>
-          </div>
-          <div style={{ width: 380 }}>
-            <p className="text-xs text-zinc-400 mb-2">Congressional districts</p>
-            <NJDistricts />
-          </div>
-        </div>
+      <main className="flex-1 p-6">
+        <p className="text-xs text-zinc-500 mb-8">119th Congress · {ALL_STATES.length} states</p>
+        {ALL_STATES.map(s => (
+          <StateRow key={s.fips} {...s} />
+        ))}
       </main>
     </div>
   );
