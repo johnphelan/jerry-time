@@ -12,6 +12,7 @@ import ctDistricts from "../data/ct-districts.json";
 import deDistricts from "../data/de-districts.json";
 import flDistricts from "../data/fl-districts.json";
 import gaDistricts from "../data/ga-districts.json";
+import hiDistricts from "../data/hi-districts.json";
 import idDistricts from "../data/id-districts.json";
 import ilDistricts from "../data/il-districts.json";
 import inDistricts from "../data/in-districts.json";
@@ -65,7 +66,7 @@ const FIPS_TO_ABBR = {
 const DISTRICT_DATA = {
   "01":alDistricts,"02":akDistricts,"04":azDistricts,"05":arDistricts,
   "06":caDistricts,"08":coDistricts,"09":ctDistricts,"10":deDistricts,
-  "12":flDistricts,"13":gaDistricts,/*"15":hiDistricts — excluded, state path covers full inset rect*/"16":idDistricts,
+  "12":flDistricts,"13":gaDistricts,"15":hiDistricts,"16":idDistricts,
   "17":ilDistricts,"18":inDistricts,"19":iaDistricts,"20":ksDistricts,
   "21":kyDistricts,"22":laDistricts,"23":meDistricts,"24":mdDistricts,
   "25":maDistricts,"26":miDistricts,"27":mnDistricts,"28":msDistricts,
@@ -298,6 +299,13 @@ export default function UsMap() {
           onClick={handleBgClick}
           onMouseDown={handleMouseDown}
         >
+          <defs>
+            {selectedId && (
+              <clipPath id="state-clip">
+                <path d={states.find(s => s.id === selectedId)?.d || ""} />
+              </clipPath>
+            )}
+          </defs>
           <g
             style={{
               transform: `translate3d(${actualTx}px, ${actualTy}px, 0) scale(${actualScale})`,
@@ -333,18 +341,22 @@ export default function UsMap() {
                 />
               );
             })}
-            {activeDistricts && activeDistricts.map(d => (
-              <path
-                key={d.cd}
-                d={d.d}
-                fill={hoveredDistrict === d.cd ? "#facc15" : districtColor(d.cd)}
-                stroke={hoveredDistrict === d.cd ? "#ffffff" : "#e2e8f0"}
-                strokeWidth={hoveredDistrict === d.cd ? 1.4 / actualScale : 0.55 / actualScale}
-                style={{ cursor: "pointer", transition: "fill 0.15s" }}
-                onMouseEnter={() => setHoveredDistrict(d.cd)}
-                onMouseLeave={() => setHoveredDistrict(null)}
-              />
-            ))}
+            {activeDistricts && (
+              <g clipPath="url(#state-clip)">
+                {activeDistricts.map(d => (
+                  <path
+                    key={d.cd}
+                    d={d.d}
+                    fill={hoveredDistrict === d.cd ? "#facc15" : districtColor(d.cd)}
+                    stroke={hoveredDistrict === d.cd ? "#ffffff" : "#e2e8f0"}
+                    strokeWidth={hoveredDistrict === d.cd ? 1.4 / actualScale : 0.5 / actualScale}
+                    style={{ cursor: "pointer", transition: "fill 0.15s" }}
+                    onMouseEnter={() => setHoveredDistrict(d.cd)}
+                    onMouseLeave={() => setHoveredDistrict(null)}
+                  />
+                ))}
+              </g>
+            )}
           </g>
         </svg>
 
