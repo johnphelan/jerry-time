@@ -340,7 +340,7 @@ export default function UsMap() {
               {lockedDistrict
                 ? "District locked. Click the X to exit lock mode and keep the map view."
                 : districtInfo
-                  ? "Hover over districts to see details. Click a district to lock it."
+                  ? "Hover over districts to see details. Click a district to lock it; click X to exit lock mode."
                   : "Press Escape to deselect"}
             </div>
           ) : hoveredId ? (
