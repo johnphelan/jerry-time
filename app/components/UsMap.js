@@ -338,7 +338,7 @@ export default function UsMap() {
           {selectedId ? (
             <div style={{ fontSize: 15, color: "#f0f0f0", fontWeight: 500 }}>
               {lockedDistrict
-                ? "District locked. Click the X to exit lock mode and return to district hover."
+                ? "District locked. Click the X to exit lock mode and keep the map view."
                 : districtInfo
                   ? "Hover over districts to see details. Click a district to lock it."
                   : "Press Escape to deselect"}
@@ -484,7 +484,6 @@ export default function UsMap() {
               if (lockedDistrict) {
                 setLockedDistrict(null);
                 setHoveredDistrict(null);
-                setExtraZoom(1);
                 setXPressed(false);
                 return;
               }
