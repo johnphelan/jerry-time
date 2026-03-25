@@ -468,6 +468,7 @@ export default function UsMap() {
               }}
             >−</button>
           </div>
+          </>
         )}
 
         <div className="mt-3 flex justify-center">
