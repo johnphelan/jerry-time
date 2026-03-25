@@ -327,9 +327,11 @@ export default function UsMap() {
         >
           {selectedId ? (
             <div style={{ fontSize: 15, color: "#f0f0f0", fontWeight: 500 }}>
-              {districtInfo
-                ? "Hover over districts to see details"
-                : "Press Escape to deselect"}
+              {lockedDistrict
+                ? "District locked. Press Escape to exit lock mode."
+                : districtInfo
+                  ? "Hover over districts to see details. Click a district to lock it."
+                  : "Press Escape to deselect"}
             </div>
           ) : hoveredId ? (
             <div style={{ fontSize: 15, color: "#f0f0f0", fontWeight: 500 }}>
@@ -403,8 +405,12 @@ export default function UsMap() {
                       stroke={isSelectedDistrict || isHoveredDistrict ? "#ffffff" : "#e2e8f0"}
                       strokeWidth={(isSelectedDistrict || isHoveredDistrict ? 1.4 : 0.5) / actualScale}
                       style={{ cursor: "pointer", transition: "fill 0.15s" }}
-                      onMouseEnter={() => setHoveredDistrict(d.cd)}
-                      onMouseLeave={() => setHoveredDistrict(prev => (lockedDistrict === prev ? prev : null))}
+                      onMouseEnter={() => {
+                        if (!lockedDistrict) setHoveredDistrict(d.cd);
+                      }}
+                      onMouseLeave={() => {
+                        if (!lockedDistrict) setHoveredDistrict(null);
+                      }}
                       onClick={e => {
                         e.stopPropagation();
                         setLockedDistrict(d.cd);
