@@ -337,7 +337,7 @@ export default function UsMap() {
           {selectedId ? (
             <div style={{ fontSize: 15, color: "#f0f0f0", fontWeight: 500 }}>
               {lockedDistrict
-                ? "District locked. Click the X to exit lock mode and congressional view."
+                ? "District locked. Click the X to exit lock mode and return to district hover."
                 : districtInfo
                   ? "Hover over districts to see details. Click a district to lock it."
                   : "Press Escape to deselect"}
