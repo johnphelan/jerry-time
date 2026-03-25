@@ -135,6 +135,7 @@ function getZoomTransform(bounds) {
 export default function UsMap() {
   const [hoveredId, setHoveredId]   = useState(null);
   const [selectedId, setSelectedId] = useState(null);
+  const [lockedDistrict, setLockedDistrict] = useState(null);
   const [transform, setTransform]   = useState({ scale: 1, tx: 0, ty: 0 });
   const [panel, setPanel] = useState({ label: "National — Top Fundraisers", candidates: [], loading: true });
   const [showDistricts, setShowDistricts] = useState(false);
@@ -196,6 +197,7 @@ export default function UsMap() {
   function resetState() {
     clearTimeout(districtsRef.current);
     setShowDistricts(false);
+    setLockedDistrict(null);
     setExtraZoom(1);
     setPanOffset({ x: 0, y: 0 });
     setHoveredDistrict(null);
@@ -206,6 +208,22 @@ export default function UsMap() {
     didDragRef.current = false;
   }
 
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key === "Escape") {
+        if (lockedDistrict) {
+          setLockedDistrict(null);
+          setHoveredDistrict(null);
+          setExtraZoom(1);
+        } else {
+          resetState();
+        }
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [lockedDistrict]);
+
   function handleClick(s, e) {
     e.stopPropagation();
     if (didDragRef.current) return;
@@ -214,6 +232,7 @@ export default function UsMap() {
     } else {
       clearTimeout(districtsRef.current);
       setShowDistricts(false);
+      setLockedDistrict(null);
       setHoveredDistrict(null);
       setExtraZoom(1);
       setPanOffset({ x: 0, y: 0 });
@@ -373,18 +392,28 @@ export default function UsMap() {
             })}
             {activeDistricts && (
               <g clipPath="url(#state-clip)">
-                {activeDistricts.map(d => (
-                  <path
-                    key={d.cd}
-                    d={d.d}
-                    fill={hoveredDistrict === d.cd ? "#facc15" : districtColor(d.cd)}
-                    stroke={hoveredDistrict === d.cd ? "#ffffff" : "#e2e8f0"}
-                    strokeWidth={hoveredDistrict === d.cd ? 1.4 / actualScale : 0.5 / actualScale}
-                    style={{ cursor: "pointer", transition: "fill 0.15s" }}
-                    onMouseEnter={() => setHoveredDistrict(d.cd)}
-                    onMouseLeave={() => setHoveredDistrict(null)}
-                  />
-                ))}
+                {activeDistricts.map(d => {
+                  const isSelectedDistrict = lockedDistrict === d.cd;
+                  const isHoveredDistrict = hoveredDistrict === d.cd;
+                  return (
+                    <path
+                      key={d.cd}
+                      d={d.d}
+                      fill={isSelectedDistrict || isHoveredDistrict ? "#facc15" : districtColor(d.cd)}
+                      stroke={isSelectedDistrict || isHoveredDistrict ? "#ffffff" : "#e2e8f0"}
+                      strokeWidth={(isSelectedDistrict || isHoveredDistrict ? 1.4 : 0.5) / actualScale}
+                      style={{ cursor: "pointer", transition: "fill 0.15s" }}
+                      onMouseEnter={() => setHoveredDistrict(d.cd)}
+                      onMouseLeave={() => setHoveredDistrict(prev => (lockedDistrict === prev ? prev : null))}
+                      onClick={e => {
+                        e.stopPropagation();
+                        setLockedDistrict(d.cd);
+                        setHoveredDistrict(d.cd);
+                        setExtraZoom(1.25);
+                      }}
+                    />
+                  );
+                })}
               </g>
             )}
           </g>
@@ -467,14 +496,15 @@ export default function UsMap() {
           {/* Rows 3+4: district block — shown on district hover, or when hovering a no-overlay state (e.g. Hawaii) */}
           {(() => {
             const hawaiiHover = selectedId === "15" && hoveredId === "15";
-            const show = (hoveredDistrict && activeDistricts) || hawaiiHover;
-            const districtLabel = hoveredDistrict && activeDistricts
-              ? activeDistricts.find(d => d.cd === hoveredDistrict)?.name ?? ""
-              : hawaiiHover ? "At Large" : "placeholder";
+          const selectedDistrict = (lockedDistrict || hoveredDistrict) && activeDistricts ? (lockedDistrict || hoveredDistrict) : null;
+          const show = (selectedDistrict && activeDistricts) || hawaiiHover;
+          const districtLabel = selectedDistrict && activeDistricts
+            ? activeDistricts.find(d => d.cd === selectedDistrict)?.name ?? ""
+            : hawaiiHover ? "At Large" : "placeholder";
 
             // Look up incumbent
             const selectedStateName = states.find(s => s.id === selectedId)?.name;
-            const districtNum = hoveredDistrict ? parseInt(hoveredDistrict, 10) : 0;
+            const districtNum = selectedDistrict ? parseInt(selectedDistrict, 10) : 0;
             const incumbent = selectedStateName
               ? membersMap[`${selectedStateName}-${districtNum}`]
               : null;
@@ -510,8 +540,9 @@ export default function UsMap() {
         {panel.loading ? (
           <p className="text-sm text-zinc-400">Loading...</p>
         ) : (() => {
-          const displayed = hoveredDistrict && activeDistricts
-            ? panel.candidates.filter(c => parseInt(c.district) === parseInt(hoveredDistrict))
+          const selectedDistrictVal = lockedDistrict || hoveredDistrict;
+          const displayed = selectedDistrictVal && activeDistricts
+            ? panel.candidates.filter(c => parseInt(c.district) === parseInt(selectedDistrictVal))
             : panel.candidates;
           return displayed.length === 0 ? (
             <p className="text-sm text-zinc-500">No 2026 filings yet.</p>
