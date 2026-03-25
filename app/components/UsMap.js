@@ -136,6 +136,7 @@ export default function UsMap() {
   const [hoveredId, setHoveredId]   = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [lockedDistrict, setLockedDistrict] = useState(null);
+  const [xPressed, setXPressed] = useState(false);
   const [transform, setTransform]   = useState({ scale: 1, tx: 0, ty: 0 });
   const [panel, setPanel] = useState({ label: "National — Top Fundraisers", candidates: [], loading: true });
   const [showDistricts, setShowDistricts] = useState(false);
@@ -484,17 +485,25 @@ export default function UsMap() {
                 setLockedDistrict(null);
                 setHoveredDistrict(null);
                 setExtraZoom(1);
+                setXPressed(false);
                 return;
               }
               resetState();
             }}
-            onMouseDown={e => e.stopPropagation()}
+            onMouseDown={e => {
+              e.stopPropagation();
+              setXPressed(true);
+            }}
+            onMouseUp={() => setXPressed(false)}
+            onMouseLeave={() => setXPressed(false)}
             style={{
-              position: "absolute", bottom: 16, right: 16,
-              width: 44, height: 44, borderRadius: "50%", border: "2px solid #facc15",
-              background: "#111827", color: "#facc15", fontSize: 22,
-              fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: "0 0 10px rgba(250, 204, 21, 0.35)",
+              position: "absolute", bottom: 24, right: 24,
+              width: 52, height: 52, borderRadius: "50%", border: "2px solid #facc15",
+              background: xPressed ? "#facc15" : "#111827", color: xPressed ? "#111827" : "#facc15", fontSize: 24,
+              fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: xPressed ? "0 0 14px rgba(250, 204, 21, 0.6)" : "0 0 12px rgba(250, 204, 21, 0.35)",
+              transform: xPressed ? "scale(0.95)" : "scale(1)",
+              transition: "transform 0.1s ease, background 0.1s ease, color 0.1s ease",
             }}
             title="Exit locked view"
           >✕</button>
