@@ -517,8 +517,8 @@ export default function UsMap() {
             <p className="text-sm text-zinc-500">No 2026 filings yet.</p>
           ) : (
           <ul className="space-y-2">
-            {displayed.map(c => (
-              <li key={c.candidate_id} className="rounded border border-zinc-700 p-2 text-sm">
+            {displayed.map((c, idx) => (
+              <li key={`${c.candidate_id}-${c.district}-${idx}`} className="rounded border border-zinc-700 p-2 text-sm">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium leading-tight">{c.name}</span>
                   <span className={`shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold ${
