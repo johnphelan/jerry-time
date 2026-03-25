@@ -227,6 +227,12 @@ export default function UsMap() {
   function handleClick(s, e) {
     e.stopPropagation();
     if (didDragRef.current) return;
+    if (lockedDistrict) {
+      setLockedDistrict(null);
+      setHoveredDistrict(null);
+      setExtraZoom(1);
+      return;
+    }
     if (selectedId === s.id) {
       resetState();
     } else {
@@ -254,6 +260,12 @@ export default function UsMap() {
 
   function handleBgClick() {
     if (didDragRef.current) return;
+    if (lockedDistrict) {
+      setLockedDistrict(null);
+      setHoveredDistrict(null);
+      setExtraZoom(1);
+      return;
+    }
     if (selectedId) resetState();
   }
 
@@ -328,7 +340,7 @@ export default function UsMap() {
           {selectedId ? (
             <div style={{ fontSize: 15, color: "#f0f0f0", fontWeight: 500 }}>
               {lockedDistrict
-                ? "District locked. Press Escape to exit lock mode."
+                ? "District locked. Click anywhere to unlock and return to hover mode."
                 : districtInfo
                   ? "Hover over districts to see details. Click a district to lock it."
                   : "Press Escape to deselect"}
@@ -413,6 +425,12 @@ export default function UsMap() {
                       }}
                       onClick={e => {
                         e.stopPropagation();
+                        if (lockedDistrict) {
+                          setLockedDistrict(null);
+                          setHoveredDistrict(null);
+                          setExtraZoom(1);
+                          return;
+                        }
                         setLockedDistrict(d.cd);
                         setHoveredDistrict(d.cd);
                         setExtraZoom(1.25);
@@ -427,11 +445,12 @@ export default function UsMap() {
 
         {/* Zoom buttons — district states only */}
         {districtInfo && (
-          <div
-            style={{ position: "absolute", top: 16, right: 32, display: "flex", flexDirection: "column", gap: 6 }}
-            onClick={e => e.stopPropagation()}
-            onMouseDown={e => e.stopPropagation()}
-          >
+          <>
+            <div
+              style={{ position: "absolute", top: 16, right: 32, display: "flex", flexDirection: "column", gap: 6 }}
+              onClick={e => e.stopPropagation()}
+              onMouseDown={e => e.stopPropagation()}
+            >
             <button
               onClick={() => setExtraZoom(z => Math.min(z * 1.5, 10))}
               style={{
