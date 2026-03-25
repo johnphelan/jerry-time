@@ -478,7 +478,16 @@ export default function UsMap() {
 
         {(selectedId || lockedDistrict) && (
           <button
-            onClick={e => { e.stopPropagation(); resetState(); }}
+            onClick={e => {
+              e.stopPropagation();
+              if (lockedDistrict) {
+                setLockedDistrict(null);
+                setHoveredDistrict(null);
+                setExtraZoom(1);
+                return;
+              }
+              resetState();
+            }}
             onMouseDown={e => e.stopPropagation()}
             style={{
               position: "absolute", bottom: 16, right: 16,
