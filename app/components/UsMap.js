@@ -260,13 +260,10 @@ export default function UsMap() {
 
   function handleBgClick() {
     if (didDragRef.current) return;
-    if (lockedDistrict) {
-      setLockedDistrict(null);
-      setHoveredDistrict(null);
-      setExtraZoom(1);
-      return;
+    // Lock mode is exited only by the X button now.
+    if (!lockedDistrict && selectedId) {
+      resetState();
     }
-    if (selectedId) resetState();
   }
 
   function handleMouseDown(e) {
@@ -340,7 +337,7 @@ export default function UsMap() {
           {selectedId ? (
             <div style={{ fontSize: 15, color: "#f0f0f0", fontWeight: 500 }}>
               {lockedDistrict
-                ? "District locked. Click anywhere to unlock and return to hover mode."
+                ? "District locked. Click the X to exit lock mode and congressional view."
                 : districtInfo
                   ? "Hover over districts to see details. Click a district to lock it."
                   : "Press Escape to deselect"}
@@ -425,15 +422,10 @@ export default function UsMap() {
                       }}
                       onClick={e => {
                         e.stopPropagation();
-                        if (lockedDistrict) {
-                          setLockedDistrict(null);
-                          setHoveredDistrict(null);
-                          setExtraZoom(1);
-                          return;
+                        if (!lockedDistrict) {
+                          setLockedDistrict(d.cd);
+                          setHoveredDistrict(d.cd);
                         }
-                        setLockedDistrict(d.cd);
-                        setHoveredDistrict(d.cd);
-                        setExtraZoom(1.25);
                       }}
                     />
                   );
@@ -484,17 +476,18 @@ export default function UsMap() {
           </button>
         </div>
 
-        {selectedId && (
+        {(selectedId || lockedDistrict) && (
           <button
             onClick={e => { e.stopPropagation(); resetState(); }}
             onMouseDown={e => e.stopPropagation()}
             style={{
-              position: "absolute", bottom: 8, right: 32,
-              width: 28, height: 28, borderRadius: 6, border: "1px solid #3f3f46",
-              background: "#18181b", color: "#a1a1aa", fontSize: 14,
-              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+              position: "absolute", bottom: 16, right: 16,
+              width: 44, height: 44, borderRadius: "50%", border: "2px solid #facc15",
+              background: "#111827", color: "#facc15", fontSize: 22,
+              fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 0 10px rgba(250, 204, 21, 0.35)",
             }}
-            title="Back to full map"
+            title="Exit locked view"
           >✕</button>
         )}
       </div>
