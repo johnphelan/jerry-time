@@ -290,8 +290,38 @@ export default function UsMap() {
 
   return (
     <div className="flex w-full gap-4" style={{ alignItems: "flex-start" }}>
-      {/* Map */}
+      {/* Map container */}
       <div style={{ flex: "1 1 0", minWidth: 0, paddingRight: 24, marginLeft: -12, position: "relative" }}>
+        {/* Instructions above map */}
+        <div
+          style={{
+            textAlign: "center",
+            color: "#ffffff",
+            fontSize: 16,
+            lineHeight: 1.5,
+            marginBottom: 16,
+            minHeight: 44,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {selectedId ? (
+            <div style={{ fontSize: 15, color: "#f0f0f0", fontWeight: 500 }}>
+              {districtInfo
+                ? "Hover over districts to see details"
+                : "Press Escape to deselect"}
+            </div>
+          ) : hoveredId ? (
+            <div style={{ fontSize: 15, color: "#f0f0f0", fontWeight: 500 }}>
+              Click to select a state
+            </div>
+          ) : (
+            <div style={{ fontSize: 15, color: "#e4e4e7", fontWeight: 500 }}>
+              Hover over a state to view statistics
+            </div>
+          )}
+        </div>
         <svg
           ref={svgRef}
           viewBox={`0 0 ${W} ${H}`}
